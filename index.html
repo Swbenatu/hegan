@@ -16,7 +16,7 @@ body{background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,sans-serif;pa
 nav{display:flex;flex-direction:column;width:92px;background:var(--nav);flex:none}
 nav>button{flex:1;border:0;background:none;color:var(--navt);opacity:.6;font:600 14px system-ui;border-bottom:1px solid #ffffff22;cursor:pointer}
 nav button.on{opacity:1;background:#ffffff1f;box-shadow:inset 4px 0 var(--up)}
-.mini{display:flex;height:46px;flex:none}.mini button{flex:1;border:0;background:none;color:var(--navt);opacity:.6;font-size:20px;cursor:pointer}
+.mini{display:flex;height:46px;flex:none}.mini button{flex:1;border:0;background:none;color:var(--navt);opacity:.6;font-size:17px;cursor:pointer}
 .screen{display:none;flex:1;min-width:0;min-height:0;flex-direction:column;padding:10px 14px;overflow:auto}
 .screen.on{display:flex}
 small{color:var(--mut);font-size:13px}h3{margin:14px 0 6px}
@@ -48,11 +48,16 @@ input{background:var(--card);color:var(--ink);font-weight:400}
 :root[data-mode="multi"] .cell:nth-child(8n+1){--ac:#35e08c}:root[data-mode="multi"] .cell:nth-child(8n+2){--ac:#4cc9f0}:root[data-mode="multi"] .cell:nth-child(8n+3){--ac:#f9c74f}:root[data-mode="multi"] .cell:nth-child(8n+4){--ac:#f9844a}:root[data-mode="multi"] .cell:nth-child(8n+5){--ac:#b388ff}:root[data-mode="multi"] .cell:nth-child(8n+6){--ac:#ff6fb5}:root[data-mode="multi"] .cell:nth-child(8n+7){--ac:#a3e635}:root[data-mode="multi"] .cell:nth-child(8n+8){--ac:#ff5d5d}
 :root[data-mode="multi"] .side div:nth-child(1) b{color:#4cc9f0}:root[data-mode="multi"] .side div:nth-child(2) b{color:#f9c74f}:root[data-mode="multi"] .side div:nth-child(3) b{color:#f9844a}:root[data-mode="multi"] .side div:nth-child(4) b{color:#35e08c}
 :root[data-mode="multi"] #hd{color:#f9c74f}
+.map{position:relative;flex:1;min-height:0}#mc{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.ov{position:absolute;left:8px;top:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 14px;opacity:.94}
+.ov b{font:700 clamp(2.2rem,16vh,5rem)/1.05 system-ui;font-variant-numeric:tabular-nums}.ov div{display:flex;align-items:baseline;gap:6px}
+.zb{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:6px}.zb button{width:48px;padding:0;font-size:22px}
+.att{position:absolute;right:6px;bottom:4px;font-size:11px;background:#ffffffb0;color:#222;padding:1px 5px;border-radius:4px}
 @media (orientation:portrait){#app{flex-direction:column-reverse}nav{flex-direction:row;width:auto;height:64px}nav>button{border-bottom:0}.mini{width:100px;height:auto}.live,.comp{flex-direction:column}#gauge{width:auto;height:50px}.side{width:100%}.grid{grid-template-columns:repeat(2,1fr)}#rose{height:auto;max-width:70%}}
 </style></head><body><div id="app">
 <nav>
 <button data-s="0" class="on" data-i="n_live"></button><button data-s="1" data-i="n_alt"></button><button data-s="2" data-i="n_fl"></button><button data-s="3" data-i="n_pr"></button><button data-s="4" data-i="n_sv"></button>
-<div class="mini"><button data-s="5" aria-label="Compass">🧭</button><button data-s="6" aria-label="Settings">⚙️</button></div>
+<div class="mini"><button data-s="5" aria-label="Compass">🧭</button><button data-s="7" aria-label="Map">🗺️</button><button data-s="6" aria-label="Settings">⚙️</button></div>
 </nav>
 
 <section class="screen on" id="s0">
@@ -98,6 +103,11 @@ input{background:var(--card);color:var(--ink);font-weight:400}
  <div class="hd"><div class="big" id="hd" style="font-size:clamp(3rem,28vh,9rem)">–</div><b id="cd" style="font-size:2rem"></b><br><small id="hs"></small></div>
 </div></section>
 
+<section class="screen" id="s7" style="padding:0"><div class="map"><canvas id="mc"></canvas>
+ <div class="ov"><div><b id="mv">–</b><small>m/s</small></div><div><b id="ma">–</b><small>m</small></div></div>
+ <div class="zb"><button class="k s" data-z="1" aria-label="Zoom +">+</button><button class="k s" data-z="-1" aria-label="Zoom -">−</button><button class="k s" id="mr" aria-label="Center">⌖</button></div>
+ <div class="att">© OpenStreetMap contributors</div></div></section>
+
 <section class="screen" id="s6">
  <div class="row" style="gap:16px"><img src="icon-192.png" width="64" height="64" alt=""><b style="font-size:1.8rem;letter-spacing:.3em">HEGAN</b></div>
  <h3 data-i="set_lang"></h3><div class="row"><button class="k s" data-l="es">Castellano</button><button class="k s" data-l="en">English</button></div>
@@ -106,11 +116,12 @@ input{background:var(--card);color:var(--ink);font-weight:400}
 </div>
 <script>
 const $=i=>document.getElementById(i);
-const T={es:{n_live:"Live",n_alt:"Altura",n_fl:"Vuelo",n_pr:"Perfil",n_sv:"Guardados",connect:"Conectar",vs_l:"velocidad vertical (m/s)",alt_l:"altura (m)",gl_l:"planeo (avance:1)",sp_l:"velocidad (km/h)",bat_l:"batería",cur_alt:"Altura actual",zero:"Poner a cero aquí",cal_ph:"altura real (m)",cal:"Calibrar",rm:"Quitar ajuste",fn_ph:"Nombre del vuelo",start:"Empezar vuelo",stop:"Terminar vuelo",tt:"Tiempo de vuelo",gt:"Sobre el despegue",th:"Térmica actual",tl:"Última térmica",mx:"Altura máxima",mn:"Altura mínima",bc:"Mejor ascenso (3 s)",ws:"Peor descenso (3 s)",di:"Distancia recorrida",vm:"Velocidad máx. (suelo)",pf_alt:"Altura",pf_trk:"Recorrido",pf_help:"Verde: subiendo. Rojo: bajando.",no_gps:"Sin datos de GPS en este vuelo",view:"Ver perfil",del:"Borrar",empty:"Aún no hay vuelos guardados.",therm:"térmicas",cdel:"¿Borrar este vuelo?",set_lang:"Idioma",set_col:"Colores",c_norm:"Normal",c_con:"Contraste",c_mul:"Multicolor",src_gps:"Rumbo GPS",src_mag:"Brújula del móvil",no_hdg:"Sin rumbo: muévete o activa los sensores",m_pick:"Elige el vario...",m_conn:"Conectando...",m_ok:"Conectado",m_nochan:"Conectado, sin canales conocidos",m_disc:"Desconectado, pulsa Conectar",m_fail:"No se pudo: ",m_nobt:"Usa Chrome (Bluetooth web).",gps_s:"GPS buscando...",gps_d:"GPS: permiso denegado",gps_n:"Sin GPS",infl:"EN VUELO",mode_l:"Modo: ",mode0:"barométrica (1013,25 hPa)",mode_z:"metros sobre este punto",mode_c:"calibrada a ",adj:"Ajusta la altura antes de empezar el vuelo",nod:"Aún no hay datos del vario",bada:"Escribe una altura válida",cf:"Conecta el vario primero (pantalla Live)"},
-en:{n_live:"Live",n_alt:"Altitude",n_fl:"Flight",n_pr:"Profile",n_sv:"Saved",connect:"Connect",vs_l:"vertical speed (m/s)",alt_l:"altitude (m)",gl_l:"glide (fwd:1)",sp_l:"speed (km/h)",bat_l:"battery",cur_alt:"Current altitude",zero:"Zero here",cal_ph:"real altitude (m)",cal:"Calibrate",rm:"Remove offset",fn_ph:"Flight name",start:"Start flight",stop:"End flight",tt:"Flight time",gt:"Above takeoff",th:"Current thermal",tl:"Last thermal",mx:"Max altitude",mn:"Min altitude",bc:"Best climb (3 s)",ws:"Worst sink (3 s)",di:"Distance flown",vm:"Max ground speed",pf_alt:"Altitude",pf_trk:"Track",pf_help:"Green: climbing. Red: sinking.",no_gps:"No GPS data in this flight",view:"View profile",del:"Delete",empty:"No saved flights yet.",therm:"thermals",cdel:"Delete this flight?",set_lang:"Language",set_col:"Colors",c_norm:"Normal",c_con:"High contrast",c_mul:"Multicolor",src_gps:"GPS course",src_mag:"Phone compass",no_hdg:"No heading: move or enable sensors",m_pick:"Pick the vario...",m_conn:"Connecting...",m_ok:"Connected",m_nochan:"Connected, no known channels",m_disc:"Disconnected, tap Connect",m_fail:"Failed: ",m_nobt:"Use Chrome (Web Bluetooth).",gps_s:"GPS searching...",gps_d:"GPS: permission denied",gps_n:"No GPS",infl:"IN FLIGHT",mode_l:"Mode: ",mode0:"barometric (1013.25 hPa)",mode_z:"metres above this point",mode_c:"calibrated to ",adj:"Adjust altitude before starting the flight",nod:"No vario data yet",bada:"Enter a valid altitude",cf:"Connect the vario first (Live screen)"}};
+const T={es:{n_live:"Live",n_alt:"Altura",n_fl:"Vuelo",n_pr:"Perfil",n_sv:"Guardados",connect:"Conectar",vs_l:"velocidad vertical (m/s)",alt_l:"altura (m)",gl_l:"planeo (avance:1)",sp_l:"velocidad (km/h)",bat_l:"batería",cur_alt:"Altura actual",zero:"Poner a cero aquí",cal_ph:"altura real (m)",cal:"Calibrar",rm:"Quitar ajuste",fn_ph:"Nombre del vuelo",start:"Empezar vuelo",stop:"Terminar vuelo",tt:"Tiempo de vuelo",gt:"Sobre el despegue",th:"Térmica actual",tl:"Última térmica",mx:"Altura máxima",mn:"Altura mínima",bc:"Mejor ascenso (3 s)",ws:"Peor descenso (3 s)",di:"Distancia recorrida",vm:"Velocidad máx. (suelo)",pf_alt:"Altura",pf_trk:"Recorrido",pf_help:"Verde: subiendo. Rojo: bajando.",no_gps:"Sin datos de GPS en este vuelo",view:"Ver perfil",del:"Borrar",empty:"Aún no hay vuelos guardados.",therm:"térmicas",cdel:"¿Borrar este vuelo?",set_lang:"Idioma",set_col:"Colores",c_norm:"Normal",c_con:"Contraste",c_mul:"Multicolor",src_gps:"Rumbo GPS",src_mag:"Brújula del móvil",no_hdg:"Sin rumbo: muévete o activa los sensores",m_pick:"Elige el vario...",m_conn:"Conectando...",m_ok:"Conectado",m_nochan:"Conectado, sin canales conocidos",m_disc:"Desconectado, pulsa Conectar",m_fail:"No se pudo: ",m_nobt:"Usa Chrome (Bluetooth web).",gps_s:"GPS buscando...",gps_d:"GPS: permiso denegado",gps_n:"Sin GPS",infl:"EN VUELO",mode_l:"Modo: ",mode0:"barométrica (1013,25 hPa)",mode_z:"metros sobre este punto",mode_c:"calibrada a ",adj:"Ajusta la altura antes de empezar el vuelo",nod:"Aún no hay datos del vario",bada:"Escribe una altura válida",cf:"Conecta el vario primero (pantalla Live)",map_wait:"Esperando posición GPS...",map_off:"Sin conexión: se muestra solo el recorrido"},
+en:{n_live:"Live",n_alt:"Altitude",n_fl:"Flight",n_pr:"Profile",n_sv:"Saved",connect:"Connect",vs_l:"vertical speed (m/s)",alt_l:"altitude (m)",gl_l:"glide (fwd:1)",sp_l:"speed (km/h)",bat_l:"battery",cur_alt:"Current altitude",zero:"Zero here",cal_ph:"real altitude (m)",cal:"Calibrate",rm:"Remove offset",fn_ph:"Flight name",start:"Start flight",stop:"End flight",tt:"Flight time",gt:"Above takeoff",th:"Current thermal",tl:"Last thermal",mx:"Max altitude",mn:"Min altitude",bc:"Best climb (3 s)",ws:"Worst sink (3 s)",di:"Distance flown",vm:"Max ground speed",pf_alt:"Altitude",pf_trk:"Track",pf_help:"Green: climbing. Red: sinking.",no_gps:"No GPS data in this flight",view:"View profile",del:"Delete",empty:"No saved flights yet.",therm:"thermals",cdel:"Delete this flight?",set_lang:"Language",set_col:"Colors",c_norm:"Normal",c_con:"High contrast",c_mul:"Multicolor",src_gps:"GPS course",src_mag:"Phone compass",no_hdg:"No heading: move or enable sensors",m_pick:"Pick the vario...",m_conn:"Connecting...",m_ok:"Connected",m_nochan:"Connected, no known channels",m_disc:"Disconnected, tap Connect",m_fail:"Failed: ",m_nobt:"Use Chrome (Web Bluetooth).",gps_s:"GPS searching...",gps_d:"GPS: permission denied",gps_n:"No GPS",infl:"IN FLIGHT",mode_l:"Mode: ",mode0:"barometric (1013.25 hPa)",mode_z:"metres above this point",mode_c:"calibrated to ",adj:"Adjust altitude before starting the flight",nod:"No vario data yet",bada:"Enter a valid altitude",cf:"Connect the vario first (Live screen)",map_wait:"Waiting for GPS position...",map_off:"Offline: showing the track only"}};
 const CARD={es:['N','NE','E','SE','S','SO','O','NO'],en:['N','NE','E','SE','S','SW','W','NW']};
 const SV=['6e400001-b5a3-f393-e0a9-e50e24dcca9e','0000ffe0-0000-1000-8000-00805f9b34fb','0000fff0-0000-1000-8000-00805f9b34fb','0000abf0-0000-1000-8000-00805f9b34fb','0000180f-0000-1000-8000-00805f9b34fb','49535343-fe7d-4ae5-8fa9-9fafd205e455','0000ffb0-0000-1000-8000-00805f9b34fb','0000fe59-0000-1000-8000-00805f9b34fb'];
 let lang=(navigator.language||'es').startsWith('en')?'en':'es',cmode='normal',rawAlt=null,off=0,om={k:'0'},altS=null,lastT=0,F=null,V=null,flights=[],win=[],buf='',cur=0,wl=null,pv='alt',devH=null;
+let liveT=[],mz=14,mf=true,mcen=null,lastSv=0;
 let gps={sp:null,acc:null,t:0,hdg:null,lat:null,lon:null},an=null,gpsOn=false;
 const ld=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(_){return d}},sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(_){}};
 {const s=ld('hegan_set',{});if(s.lang)lang=s.lang;if(s.mode)cmode=s.mode;const o=ld('hegan_off',null);if(o){off=o.off;om=o.om}flights=ld('hegan_flights',[])}
@@ -135,7 +146,7 @@ function setMode(m){cmode=m;document.documentElement.dataset.mode=m;document.que
 document.querySelectorAll('[data-l]').forEach(e=>e.onclick=()=>{lang=e.dataset.l;sv('hegan_set',{lang,mode:cmode});applyLang()});
 document.querySelectorAll('[data-m]').forEach(e=>e.onclick=()=>setMode(e.dataset.m));
 document.querySelectorAll('[data-pv]').forEach(e=>e.onclick=()=>{pv=e.dataset.pv;document.querySelectorAll('[data-pv]').forEach(x=>x.classList.toggle('act',x===e));render()});
-function show(i){cur=i;document.querySelectorAll('.screen').forEach(e=>e.classList.toggle('on',e.id==='s'+i));document.querySelectorAll('nav button').forEach(e=>e.classList.toggle('on',+e.dataset.s===i));render()}
+function show(i){cur=i;if(i===7)startGPS();document.querySelectorAll('.screen').forEach(e=>e.classList.toggle('on',e.id==='s'+i));document.querySelectorAll('nav button').forEach(e=>e.classList.toggle('on',+e.dataset.s===i));render()}
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>show(+b.dataset.s));
 async function wake(on){try{if(on)wl=await navigator.wakeLock.request('screen');else if(wl){await wl.release();wl=null}}catch(_){}}
 document.addEventListener('visibilitychange',()=>{if(F&&document.visibilityState==='visible')wake(true)});
@@ -163,6 +174,8 @@ function onPos(p){
  if(c.speed!=null&&c.speed>=0)gps.sp=gps.sp==null?c.speed:gps.sp+0.4*(c.speed-gps.sp);
  if(c.heading!=null&&!isNaN(c.heading))gps.hdg=c.heading;
  gps.t=Date.now();if(F)F.vmax=Math.max(F.vmax,gps.sp||0);updCompass();
+ if(c.accuracy<=50){const va=win.length?win.reduce((q,x)=>q+x.vs,0)/win.length:0;if(!liveT.length||gps.t-liveT[liveT.length-1][3]>=2000){liveT.push([c.latitude,c.longitude,va,gps.t]);if(liveT.length>900)liveT.shift()}
+  if(gps.t-lastSv>10000){lastSv=gps.t;sv('hegan_last',[c.latitude,c.longitude])}}
 }
 const sm=(a,b,k)=>(a+k*(((b-a+540)%360)-180)+360)%360;
 addEventListener('deviceorientationabsolute',e=>{if(e.alpha==null)return;const h=(360-e.alpha+((screen.orientation&&screen.orientation.angle)||0)+720)%360;devH=devH==null?h:sm(devH,h,.2);updCompass()},true);
@@ -186,7 +199,8 @@ function onLine(l){
  if(altS===null||tm-lastT>5000)altS=a;else altS+=(1-Math.exp(-(tm-lastT)/1000))*(a-altS);
  lastT=tm;
  $('v').textContent=(vs>=0?'+':'')+vs.toFixed(1);$('v').style.color=vs>0.3?'var(--up)':vs<-2?'var(--dn)':'';gauge(vs);
- $('a').textContent=$('a2').textContent=altS.toFixed(0);
+ $('a').textContent=$('a2').textContent=$('ma').textContent=altS.toFixed(0);
+ $('mv').textContent=$('v').textContent;$('mv').style.color=$('v').style.color;
  win.push({t:tm,vs});while(win[0].t<tm-3000)win.shift();
  if(F)upd(tm,altS,win.reduce((s,x)=>s+x.vs,0)/win.length);
 }
@@ -236,6 +250,7 @@ function render(){
   $('di').textContent=((f.dist||0)/1000).toFixed(2)+' km';$('vm').textContent=((f.vmax||0)*3.6).toFixed(0)+' km/h';
  }
  if(cur===3)(pv==='alt'?draw:track)(f?f.pr:[]);
+ if(cur===7)drawMap();
  updCompass();
 }
 const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -263,6 +278,45 @@ function track(pr){
  for(let i=1;i<pts.length;i++){g.strokeStyle=vcol(pts[i][2]);g.beginPath();g.moveTo(px(pts[i-1]),py(pts[i-1]));g.lineTo(px(pts[i]),py(pts[i]));g.stroke()}
  g.fillStyle=css('--ink');g.beginPath();g.arc(px(pts[0]),py(pts[0]),7,0,7);g.fill();g.fillRect(px(pts[pts.length-1])-6,py(pts[pts.length-1])-6,12,12);
 }
+
+const proj=(la,lo,z)=>{const n=2**z*256,s=Math.sin(la*Math.PI/180);return [(lo+180)/360*n,(0.5-Math.log((1+s)/(1-s))/(4*Math.PI))*n]};
+const unproj=(x,y,z)=>{const n=2**z*256;return [Math.atan(Math.sinh(Math.PI*(1-2*y/n)))*180/Math.PI,x/n*360-180]};
+const TC=new Map();
+function tile(z,x,y){const k=z+'/'+x+'/'+y;let im=TC.get(k);
+ if(im){if(im.err&&Date.now()-im.err>30000)TC.delete(k);else return im}
+ if(TC.size>300)TC.clear();
+ im=new Image();im.crossOrigin='anonymous';im.onload=()=>{im.ok=true};im.onerror=()=>{im.err=Date.now()};
+ im.src='https://tile.openstreetmap.org/'+k+'.png';TC.set(k,im);return im}
+const mfix=()=>gps.lat!=null&&Date.now()-gps.t<15000?[gps.lat,gps.lon]:null;
+const mcenter=()=>(mf&&mfix())||mcen||mfix()||ld('hegan_last',null)||[40.4,-3.7];
+function drawMap(){
+ const cv=$('mc'),g=cv.getContext('2d'),dp=window.devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;if(!W||!H)return;
+ cv.width=W*dp;cv.height=H*dp;g.setTransform(dp,0,0,dp,0,0);
+ const c=mcenter(),z=mz,n=2**z,[cx,cy]=proj(c[0],c[1],z),ox=cx-W/2,oy=cy-H/2;
+ g.fillStyle=css('--card');g.fillRect(0,0,W,H);let ok=0,er=0;
+ for(let ty=Math.floor(oy/256);ty<=Math.floor((oy+H)/256);ty++)for(let tx=Math.floor(ox/256);tx<=Math.floor((ox+W)/256);tx++){
+  if(ty<0||ty>=n)continue;const im=tile(z,((tx%n)+n)%n,ty);
+  if(im.ok){g.drawImage(im,tx*256-ox,ty*256-oy);ok++}else if(im.err)er++}
+ const cu=css('--up'),cd=css('--dn'),cm='#555',P=(la,lo)=>{const p=proj(la,lo,z);return [p[0]-ox,p[1]-oy]};
+ g.lineCap='round';g.lineJoin='round';
+ for(const [col,w] of [['#fff',9],[null,5]])for(let i=1;i<liveT.length;i++){
+  const a=P(liveT[i-1][0],liveT[i-1][1]),b=P(liveT[i][0],liveT[i][1]),v=liveT[i][2];
+  g.strokeStyle=col||(v>0.2?cu:v<-0.2?cd:cm);g.lineWidth=w;g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke()}
+ const f=mfix();
+ if(f){const p=P(f[0],f[1]);g.save();g.translate(p[0],p[1]);
+  const mv=gps.sp!=null&&gps.sp>1.5&&gps.hdg!=null;
+  if(mv){g.rotate(gps.hdg*Math.PI/180);g.beginPath();g.moveTo(0,-16);g.lineTo(11,12);g.lineTo(0,6);g.lineTo(-11,12);g.closePath()}else{g.beginPath();g.arc(0,0,9,0,7)}
+  g.fillStyle='#1d6fe8';g.fill();g.strokeStyle='#fff';g.lineWidth=3;g.stroke();g.restore()}
+ g.font='600 14px system-ui';g.fillStyle='#222';
+ if(!f)g.fillText(t('map_wait'),W/2-90,H-30);else if(!ok&&er)g.fillText(t('map_off'),W/2-130,H-30);
+}
+let dr=null;const mcv=$('mc');
+mcv.onpointerdown=e=>{dr={x:e.clientX,y:e.clientY};mcv.setPointerCapture(e.pointerId)};
+mcv.onpointermove=e=>{if(!dr)return;const dx=e.clientX-dr.x,dy=e.clientY-dr.y;dr={x:e.clientX,y:e.clientY};
+ const c=mcenter(),p=proj(c[0],c[1],mz);mcen=unproj(p[0]-dx,p[1]-dy,mz);mf=false;drawMap()};
+mcv.onpointerup=mcv.onpointercancel=()=>{dr=null};
+document.querySelectorAll('[data-z]').forEach(b=>b.onclick=()=>{mz=Math.max(5,Math.min(17,mz+ +b.dataset.z));drawMap()});
+$('mr').onclick=()=>{mf=true;mcen=null;drawMap()};
 setInterval(render,500);addEventListener('resize',render);
 
 const dl=(n,txt,type)=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type}));a.download=n;a.click()};
