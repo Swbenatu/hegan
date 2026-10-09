@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es" data-mode="normal"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HEGAN</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1a1a1a">
+<link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#eef3f6;--ink:#12303f;--mut:#51707f;--card:#fff;--line:#c9d8e0;--up:#0e8a5f;--dn:#d62828;--nav:#1a1a1a;--navt:#e3eef3}
+@media (prefers-color-scheme:dark){:root:not([data-mode="contrast"]):not([data-mode="multi"]){--bg:#0b161d;--ink:#e8f2f6;--mut:#8fb0bf;--card:#162933;--line:#27414f;--up:#3ddc97;--dn:#ff6b6b;--nav:#050b0f}}
+:root[data-mode="contrast"]{--bg:#000;--ink:#fff;--mut:#e0e0e0;--card:#000;--line:#fff;--up:#00ff6a;--dn:#ff3b3b;--nav:#000;--navt:#fff}
+:root[data-mode="multi"]{--bg:#0b161d;--ink:#f1f6f8;--mut:#a9c3cf;--card:#142733;--line:#2b4757;--up:#35e08c;--dn:#ff5d5d;--nav:#050b0f;--navt:#e8f2f6}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,sans-serif;padding:env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0)}
+#app{display:flex;height:100%}
+nav{display:flex;flex-direction:column;width:92px;background:var(--nav);flex:none}
+nav>button{flex:1;border:0;background:none;color:var(--navt);opacity:.6;font:600 14px system-ui;border-bottom:1px solid #ffffff22;cursor:pointer}
+nav button.on{opacity:1;background:#ffffff1f;box-shadow:inset 4px 0 var(--up)}
+.mini{display:flex;height:46px;flex:none}.mini button{flex:1;border:0;background:none;color:var(--navt);opacity:.6;font-size:20px;cursor:pointer}
+.screen{display:none;flex:1;min-width:0;min-height:0;flex-direction:column;padding:10px 14px;overflow:auto}
+.screen.on{display:flex}
+small{color:var(--mut);font-size:13px}h3{margin:14px 0 6px}
+button.k,input{font:600 15px system-ui;padding:10px 14px;border-radius:10px;border:1px solid var(--line);min-height:46px}
+button.k{background:var(--ink);color:var(--bg);cursor:pointer}button.s{background:var(--card);color:var(--ink)}
+button.act{outline:3px solid var(--up)}
+input{background:var(--card);color:var(--ink);font-weight:400}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.live{flex:1;display:flex;gap:16px;min-height:0;margin-top:8px}
+#gauge{position:relative;width:70px;background:var(--card);border:1px solid var(--line);border-radius:12px;flex:none;overflow:hidden}
+#gz{position:absolute;left:0;right:0;top:50%;border-top:2px solid var(--mut)}
+#gf{position:absolute;left:0;right:0;height:0;transition:height .1s}
+.mid{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.big{font:700 clamp(4rem,38vh,13rem)/1 system-ui;font-variant-numeric:tabular-nums}
+.side{width:38%;display:grid;grid-template-columns:1fr 1fr;align-content:space-around;gap:6px}
+.side b{display:block;font:700 clamp(1.7rem,11vh,4rem)/1.05 system-ui;font-variant-numeric:tabular-nums}
+.pill{font-weight:700;color:var(--up)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px;flex:1}
+.cell{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--ac,var(--line));border-radius:12px;padding:8px 12px;display:flex;flex-direction:column;justify-content:center}
+.cell b{font:700 clamp(1.5rem,9vh,3.2rem)/1.1 system-ui;font-variant-numeric:tabular-nums}
+#st{flex:1;min-width:160px;font-size:20px;min-height:54px}#st.stop{background:var(--dn);color:#fff}
+#cv{flex:1;width:100%;min-height:0;display:block}
+.r{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.comp{flex:1;display:flex;align-items:center;justify-content:space-around;gap:16px;min-height:0}
+#rose{height:96%;max-width:50%;aspect-ratio:1}.hd{text-align:center}
+:root[data-mode="contrast"] .cell,:root[data-mode="contrast"] #gauge,:root[data-mode="contrast"] input,:root[data-mode="contrast"] button.s{border-width:2px}
+:root[data-mode="contrast"] .big,:root[data-mode="contrast"] b{font-weight:900}
+:root[data-mode="multi"] .cell b{color:var(--ac)}
+:root[data-mode="multi"] .cell:nth-child(8n+1){--ac:#35e08c}:root[data-mode="multi"] .cell:nth-child(8n+2){--ac:#4cc9f0}:root[data-mode="multi"] .cell:nth-child(8n+3){--ac:#f9c74f}:root[data-mode="multi"] .cell:nth-child(8n+4){--ac:#f9844a}:root[data-mode="multi"] .cell:nth-child(8n+5){--ac:#b388ff}:root[data-mode="multi"] .cell:nth-child(8n+6){--ac:#ff6fb5}:root[data-mode="multi"] .cell:nth-child(8n+7){--ac:#a3e635}:root[data-mode="multi"] .cell:nth-child(8n+8){--ac:#ff5d5d}
+:root[data-mode="multi"] .side div:nth-child(1) b{color:#4cc9f0}:root[data-mode="multi"] .side div:nth-child(2) b{color:#f9c74f}:root[data-mode="multi"] .side div:nth-child(3) b{color:#f9844a}:root[data-mode="multi"] .side div:nth-child(4) b{color:#35e08c}
+:root[data-mode="multi"] #hd{color:#f9c74f}
+@media (orientation:portrait){#app{flex-direction:column-reverse}nav{flex-direction:row;width:auto;height:64px}nav>button{border-bottom:0}.mini{width:100px;height:auto}.live,.comp{flex-direction:column}#gauge{width:auto;height:50px}.side{width:100%}.grid{grid-template-columns:repeat(2,1fr)}#rose{height:auto;max-width:70%}}
+</style></head><body><div id="app">
+<nav>
+<button data-s="0" class="on" data-i="n_live"></button><button data-s="1" data-i="n_alt"></button><button data-s="2" data-i="n_fl"></button><button data-s="3" data-i="n_pr"></button><button data-s="4" data-i="n_sv"></button>
+<div class="mini"><button data-s="5" aria-label="Compass">🧭</button><button data-s="6" aria-label="Settings">⚙️</button></div>
+</nav>
+
+<section class="screen on" id="s0">
+ <div class="row"><input id="np" value="Mip" style="width:90px" aria-label="BLE name"><button class="k" id="b" data-i="connect"></button><small id="msg"></small><small id="gs"></small><span class="pill" id="tf"></span></div>
+ <div class="live">
+  <div id="gauge"><div id="gz"></div><div id="gf"></div></div>
+  <div class="mid"><small data-i="vs_l"></small><div class="big" id="v">–</div></div>
+  <div class="side"><div><small data-i="alt_l"></small><b id="a">–</b></div><div><small data-i="gl_l"></small><b id="gl">–</b></div><div><small data-i="sp_l"></small><b id="sp">–</b></div><div><small data-i="bat_l"></small><b id="bt">–</b></div></div>
+ </div>
+</section>
+
+<section class="screen" id="s1">
+ <small data-i="cur_alt"></small><div class="big" id="a2" style="font-size:clamp(3rem,22vh,8rem)">–</div>
+ <div class="row"><button class="k" id="z" data-i="zero"></button><input id="k" type="number" data-p="cal_ph" style="width:160px"><button class="k" id="kb" data-i="cal"></button><button class="k s" id="r" data-i="rm"></button></div>
+ <p id="am" style="color:var(--mut)"></p>
+</section>
+
+<section class="screen" id="s2">
+ <div class="row"><input id="fn" data-p="fn_ph" style="flex:1;min-width:150px"><input id="fd" type="date"><button class="k" id="st"></button></div>
+ <div class="grid">
+  <div class="cell"><small data-i="tt"></small><b id="tt">–</b></div>
+  <div class="cell"><small data-i="gt"></small><b id="gt">–</b></div>
+  <div class="cell"><small data-i="th"></small><b id="th">–</b></div>
+  <div class="cell"><small data-i="tl"></small><b id="tl">–</b></div>
+  <div class="cell"><small data-i="mx"></small><b id="mx">–</b></div>
+  <div class="cell"><small data-i="mn"></small><b id="mn">–</b></div>
+  <div class="cell"><small data-i="bc"></small><b id="bc">–</b></div>
+  <div class="cell"><small data-i="ws"></small><b id="ws">–</b></div>
+  <div class="cell"><small data-i="di"></small><b id="di">–</b></div>
+  <div class="cell"><small data-i="vm"></small><b id="vm">–</b></div>
+ </div>
+</section>
+
+<section class="screen" id="s3">
+ <div class="row"><button class="k s act" data-pv="alt" data-i="pf_alt"></button><button class="k s" data-pv="trk" data-i="pf_trk"></button><small data-i="pf_help"></small></div>
+ <canvas id="cv"></canvas>
+</section>
+
+<section class="screen" id="s4"><div id="fl"></div></section>
+
+<section class="screen" id="s5"><div class="comp">
+ <svg id="rose" viewBox="-110 -110 220 220" role="img" aria-label="Compass"><g id="rg"></g><polygon points="0,-108 9,-92 -9,-92" fill="var(--dn)"/></svg>
+ <div class="hd"><div class="big" id="hd" style="font-size:clamp(3rem,28vh,9rem)">–</div><b id="cd" style="font-size:2rem"></b><br><small id="hs"></small></div>
+</div></section>
+
+<section class="screen" id="s6">
+ <div class="row" style="gap:16px"><img src="icon-192.png" width="64" height="64" alt=""><b style="font-size:1.8rem;letter-spacing:.3em">HEGAN</b></div>
+ <h3 data-i="set_lang"></h3><div class="row"><button class="k s" data-l="es">Castellano</button><button class="k s" data-l="en">English</button></div>
+ <h3 data-i="set_col"></h3><div class="row"><button class="k s" data-m="normal" data-i="c_norm"></button><button class="k s" data-m="contrast" data-i="c_con"></button><button class="k s" data-m="multi" data-i="c_mul"></button></div>
+</section>
+</div>
+<script>
+const $=i=>document.getElementById(i);
+const T={es:{n_live:"Live",n_alt:"Altura",n_fl:"Vuelo",n_pr:"Perfil",n_sv:"Guardados",connect:"Conectar",vs_l:"velocidad vertical (m/s)",alt_l:"altura (m)",gl_l:"planeo (avance:1)",sp_l:"velocidad (km/h)",bat_l:"batería",cur_alt:"Altura actual",zero:"Poner a cero aquí",cal_ph:"altura real (m)",cal:"Calibrar",rm:"Quitar ajuste",fn_ph:"Nombre del vuelo",start:"Empezar vuelo",stop:"Terminar vuelo",tt:"Tiempo de vuelo",gt:"Sobre el despegue",th:"Térmica actual",tl:"Última térmica",mx:"Altura máxima",mn:"Altura mínima",bc:"Mejor ascenso (3 s)",ws:"Peor descenso (3 s)",di:"Distancia recorrida",vm:"Velocidad máx. (suelo)",pf_alt:"Altura",pf_trk:"Recorrido",pf_help:"Verde: subiendo. Rojo: bajando.",no_gps:"Sin datos de GPS en este vuelo",view:"Ver perfil",del:"Borrar",empty:"Aún no hay vuelos guardados.",therm:"térmicas",cdel:"¿Borrar este vuelo?",set_lang:"Idioma",set_col:"Colores",c_norm:"Normal",c_con:"Contraste",c_mul:"Multicolor",src_gps:"Rumbo GPS",src_mag:"Brújula del móvil",no_hdg:"Sin rumbo: muévete o activa los sensores",m_pick:"Elige el vario...",m_conn:"Conectando...",m_ok:"Conectado",m_nochan:"Conectado, sin canales conocidos",m_disc:"Desconectado, pulsa Conectar",m_fail:"No se pudo: ",m_nobt:"Usa Chrome (Bluetooth web).",gps_s:"GPS buscando...",gps_d:"GPS: permiso denegado",gps_n:"Sin GPS",infl:"EN VUELO",mode_l:"Modo: ",mode0:"barométrica (1013,25 hPa)",mode_z:"metros sobre este punto",mode_c:"calibrada a ",adj:"Ajusta la altura antes de empezar el vuelo",nod:"Aún no hay datos del vario",bada:"Escribe una altura válida",cf:"Conecta el vario primero (pantalla Live)"},
+en:{n_live:"Live",n_alt:"Altitude",n_fl:"Flight",n_pr:"Profile",n_sv:"Saved",connect:"Connect",vs_l:"vertical speed (m/s)",alt_l:"altitude (m)",gl_l:"glide (fwd:1)",sp_l:"speed (km/h)",bat_l:"battery",cur_alt:"Current altitude",zero:"Zero here",cal_ph:"real altitude (m)",cal:"Calibrate",rm:"Remove offset",fn_ph:"Flight name",start:"Start flight",stop:"End flight",tt:"Flight time",gt:"Above takeoff",th:"Current thermal",tl:"Last thermal",mx:"Max altitude",mn:"Min altitude",bc:"Best climb (3 s)",ws:"Worst sink (3 s)",di:"Distance flown",vm:"Max ground speed",pf_alt:"Altitude",pf_trk:"Track",pf_help:"Green: climbing. Red: sinking.",no_gps:"No GPS data in this flight",view:"View profile",del:"Delete",empty:"No saved flights yet.",therm:"thermals",cdel:"Delete this flight?",set_lang:"Language",set_col:"Colors",c_norm:"Normal",c_con:"High contrast",c_mul:"Multicolor",src_gps:"GPS course",src_mag:"Phone compass",no_hdg:"No heading: move or enable sensors",m_pick:"Pick the vario...",m_conn:"Connecting...",m_ok:"Connected",m_nochan:"Connected, no known channels",m_disc:"Disconnected, tap Connect",m_fail:"Failed: ",m_nobt:"Use Chrome (Web Bluetooth).",gps_s:"GPS searching...",gps_d:"GPS: permission denied",gps_n:"No GPS",infl:"IN FLIGHT",mode_l:"Mode: ",mode0:"barometric (1013.25 hPa)",mode_z:"metres above this point",mode_c:"calibrated to ",adj:"Adjust altitude before starting the flight",nod:"No vario data yet",bada:"Enter a valid altitude",cf:"Connect the vario first (Live screen)"}};
+const CARD={es:['N','NE','E','SE','S','SO','O','NO'],en:['N','NE','E','SE','S','SW','W','NW']};
+const SV=['6e400001-b5a3-f393-e0a9-e50e24dcca9e','0000ffe0-0000-1000-8000-00805f9b34fb','0000fff0-0000-1000-8000-00805f9b34fb','0000abf0-0000-1000-8000-00805f9b34fb','0000180f-0000-1000-8000-00805f9b34fb','49535343-fe7d-4ae5-8fa9-9fafd205e455','0000ffb0-0000-1000-8000-00805f9b34fb','0000fe59-0000-1000-8000-00805f9b34fb'];
+let lang=(navigator.language||'es').startsWith('en')?'en':'es',cmode='normal',rawAlt=null,off=0,om={k:'0'},altS=null,lastT=0,F=null,V=null,flights=[],win=[],buf='',cur=0,wl=null,pv='alt',devH=null;
+let gps={sp:null,acc:null,t:0,hdg:null,lat:null,lon:null},an=null,gpsOn=false;
+const ld=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(_){return d}},sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(_){}};
+{const s=ld('hegan_set',{});if(s.lang)lang=s.lang;if(s.mode)cmode=s.mode;const o=ld('hegan_off',null);if(o){off=o.off;om=o.om}flights=ld('hegan_flights',[])}
+const t=k=>T[lang][k]||k,sg=n=>(n>=0?'+':'')+n.toFixed(0),esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=ms=>{const s=Math.floor(ms/1000);return Math.floor(s/3600)+':'+String(Math.floor(s/60)%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+$('fd').value=new Date().toLocaleDateString('en-CA');
+
+function buildRose(){
+ let h='<circle r="95" fill="none" stroke="var(--line)" stroke-width="2"/>';
+ for(let a=0;a<360;a+=10)h+='<line y1="-95" y2="'+(a%30?-88:-82)+'" transform="rotate('+a+')" stroke="var(--mut)" stroke-width="'+(a%30?1:2)+'"/>';
+ [['N',0],['E',90],['S',180],[CARD[lang][6],270]].forEach(([c,a])=>h+='<text transform="rotate('+a+') translate(0,-62)" text-anchor="middle" dominant-baseline="central" font-size="22" font-weight="700" fill="'+(a?'var(--ink)':'var(--dn)')+'">'+c+'</text>');
+ $('rg').innerHTML=h;
+}
+function applyLang(){
+ document.documentElement.lang=lang;
+ document.querySelectorAll('[data-i]').forEach(e=>e.textContent=t(e.dataset.i));
+ document.querySelectorAll('[data-p]').forEach(e=>e.placeholder=t(e.dataset.p));
+ document.querySelectorAll('[data-l]').forEach(e=>e.classList.toggle('act',e.dataset.l===lang));
+ $('st').textContent=t(F?'stop':'start');amode();buildRose();list();render();
+}
+function setMode(m){cmode=m;document.documentElement.dataset.mode=m;document.querySelectorAll('[data-m]').forEach(e=>e.classList.toggle('act',e.dataset.m===m));sv('hegan_set',{lang,mode:cmode})}
+document.querySelectorAll('[data-l]').forEach(e=>e.onclick=()=>{lang=e.dataset.l;sv('hegan_set',{lang,mode:cmode});applyLang()});
+document.querySelectorAll('[data-m]').forEach(e=>e.onclick=()=>setMode(e.dataset.m));
+document.querySelectorAll('[data-pv]').forEach(e=>e.onclick=()=>{pv=e.dataset.pv;document.querySelectorAll('[data-pv]').forEach(x=>x.classList.toggle('act',x===e));render()});
+function show(i){cur=i;document.querySelectorAll('.screen').forEach(e=>e.classList.toggle('on',e.id==='s'+i));document.querySelectorAll('nav button').forEach(e=>e.classList.toggle('on',+e.dataset.s===i));render()}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>show(+b.dataset.s));
+async function wake(on){try{if(on)wl=await navigator.wakeLock.request('screen');else if(wl){await wl.release();wl=null}}catch(_){}}
+document.addEventListener('visibilitychange',()=>{if(F&&document.visibilityState==='visible')wake(true)});
+
+const modeText=()=>om.k==='0'?t('mode0'):om.k==='z'?t('mode_z'):t('mode_c')+om.x+' m';
+function amode(){$('am').textContent=t('mode_l')+modeText()}
+function saveOff(){sv('hegan_off',{off,om});altS=null;amode()}
+function chk(){if(F){$('am').textContent=t('adj');return false}if(rawAlt===null){$('am').textContent=t('nod');return false}return true}
+$('z').onclick=()=>{if(!chk())return;off=-rawAlt;om={k:'z'};saveOff()};
+$('kb').onclick=()=>{if(!chk())return;const x=parseFloat($('k').value);if(isNaN(x)){$('am').textContent=t('bada');return}off=x-rawAlt;om={k:'c',x};saveOff()};
+$('r').onclick=()=>{if(!chk())return;off=0;om={k:'0'};saveOff()};
+
+const hav=(a,b,c,d)=>{const R=6371000,r=Math.PI/180,x=(c-a)*r,y=(d-b)*r,h=Math.sin(x/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(y/2)**2;return 2*R*Math.asin(Math.sqrt(h))};
+function startGPS(){
+ if(gpsOn)return;if(!navigator.geolocation){$('gs').textContent='  '+t('gps_n');return}
+ gpsOn=true;
+ navigator.geolocation.watchPosition(onPos,e=>{gpsOn=false;$('gs').textContent='  '+(e.code===1?t('gps_d'):e.message)},{enableHighAccuracy:true,maximumAge:0,timeout:30000});
+}
+function onPos(p){
+ const c=p.coords,tm=p.timestamp;gps.acc=c.accuracy;
+ if(c.accuracy<=50){gps.lat=c.latitude;gps.lon=c.longitude}
+ if(an){const d=hav(an.lat,an.lon,c.latitude,c.longitude),dt=(tm-an.t)/1000;
+  if(c.accuracy<=30&&d>=3&&dt>0&&d/dt<80){if(F)F.dist+=d;if(c.speed==null)gps.sp=d/dt;an={lat:c.latitude,lon:c.longitude,t:tm}}
+ }else if(c.accuracy<=30)an={lat:c.latitude,lon:c.longitude,t:tm};
+ if(c.speed!=null&&c.speed>=0)gps.sp=gps.sp==null?c.speed:gps.sp+0.4*(c.speed-gps.sp);
+ if(c.heading!=null&&!isNaN(c.heading))gps.hdg=c.heading;
+ gps.t=Date.now();if(F)F.vmax=Math.max(F.vmax,gps.sp||0);updCompass();
+}
+const sm=(a,b,k)=>(a+k*(((b-a+540)%360)-180)+360)%360;
+addEventListener('deviceorientationabsolute',e=>{if(e.alpha==null)return;const h=(360-e.alpha+((screen.orientation&&screen.orientation.angle)||0)+720)%360;devH=devH==null?h:sm(devH,h,.2);updCompass()},true);
+function updCompass(){
+ if(cur!==5)return;
+ const g=gps.sp!=null&&gps.sp>1.5&&gps.hdg!=null&&Date.now()-gps.t<6000,h=g?gps.hdg:devH;
+ if(h==null){$('hd').textContent='–';$('cd').textContent='';$('hs').textContent=t('no_hdg');return}
+ $('hd').textContent=Math.round(h)+'°';$('cd').textContent=CARD[lang][Math.round(h/45)%8];$('hs').textContent=t(g?'src_gps':'src_mag');
+ $('rg').setAttribute('transform','rotate('+(-h)+')');
+}
+
+function gauge(v){const h=Math.min(Math.abs(v),5)/5*50,f=$('gf');f.style.height=h+'%';f.style.background=v>=0?'var(--up)':'var(--dn)';if(v>=0){f.style.bottom='50%';f.style.top='auto'}else{f.style.top='50%';f.style.bottom='auto'}}
+function onLine(l){
+ if(!l.startsWith('$LK8EX1'))return;
+ const p=l.split('*')[0].split(',');if(p.length<6)return;
+ const pa=+p[1],vs=+p[3]/100,bt=+p[5];
+ if(isNaN(pa)||isNaN(vs)||Math.abs(vs)>30||+p[3]===9999)return;
+ if(bt>=1000&&bt<=1100)$('bt').textContent=(bt-1000)+' %';else if(bt>0&&bt<=100)$('bt').textContent=bt+' %';
+ rawAlt=(pa>20000&&pa<130000)?44330*(1-Math.pow(pa/101325,0.1903)):+p[2];
+ const tm=Date.now(),a=rawAlt+off;
+ if(altS===null||tm-lastT>5000)altS=a;else altS+=(1-Math.exp(-(tm-lastT)/1000))*(a-altS);
+ lastT=tm;
+ $('v').textContent=(vs>=0?'+':'')+vs.toFixed(1);$('v').style.color=vs>0.3?'var(--up)':vs<-2?'var(--dn)':'';gauge(vs);
+ $('a').textContent=$('a2').textContent=altS.toFixed(0);
+ win.push({t:tm,vs});while(win[0].t<tm-3000)win.shift();
+ if(F)upd(tm,altS,win.reduce((s,x)=>s+x.vs,0)/win.length);
+}
+function sample(tm,a,avg){const fresh=gps.lat!=null&&Date.now()-gps.t<6000;return [Math.round((tm-F.t0)/1000),+a.toFixed(1),+avg.toFixed(2),fresh?+gps.lat.toFixed(5):null,fresh?+gps.lon.toFixed(5):null]}
+function upd(tm,a,avg){
+ const f=F;
+ f.max=Math.max(f.max,a);f.min=Math.min(f.min,a);f.bc=Math.max(f.bc,avg);f.ws=Math.min(f.ws,avg);
+ if(!f.inT){
+  if(avg>0.5){if(!f.cs){f.cs=tm;f.ca=a}if(tm-f.cs>=3000){f.inT=true;f.ts=f.ca;f.tm=a;f.ns=0}}else f.cs=0;
+ }else{
+  f.tm=Math.max(f.tm,a);
+  if(avg<0){if(!f.ns)f.ns=tm;if(tm-f.ns>=5000){f.inT=false;f.last=f.tm-f.ts;f.n++;f.cs=0;f.ns=0}}else f.ns=0;
+ }
+ if(tm-f.lp>=1000){f.lp=tm;f.pr.push(sample(tm,a,avg))}
+}
+function persist(){sv('hegan_flights',flights);list()}
+$('st').onclick=()=>{
+ if(!F){
+  if(altS===null){alert(t('cf'));return}
+  const d=$('fd').value,n=$('fn').value.trim()||('Vuelo '+d),tm=Date.now();
+  F={name:n,date:d,t0:tm,a0:altS,max:altS,min:altS,bc:-99,ws:99,inT:false,cs:0,ns:0,n:0,last:null,lp:tm,dist:0,vmax:0,pr:[]};
+  F.pr.push(sample(tm,altS,0));an=null;startGPS();
+  V=null;$('st').classList.add('stop');wake(true);
+ }else{
+  const f=F,tm=Date.now();
+  V={name:f.name,date:f.date,t0:f.t0,dur:tm-f.t0,a0:f.a0,g:altS-f.a0,max:f.max,min:f.min,bc:f.bc<-90?0:f.bc,ws:f.ws>90?0:f.ws,n:f.n,last:f.last,dist:f.dist,vmax:f.vmax,pr:f.pr};
+  flights.unshift(V);F=null;$('st').classList.remove('stop');wake(false);persist();
+ }
+ $('st').textContent=t(F?'stop':'start');render();
+};
+function render(){
+ const f=F||V,live=!!F;
+ const sp=(gps.sp!=null&&Date.now()-gps.t<6000)?gps.sp:null,vsa=win.length?win.reduce((q,x)=>q+x.vs,0)/win.length:0;
+ $('sp').textContent=sp==null?'–':(sp*3.6).toFixed(0);
+ let gl='–';if(sp!=null){if(Math.abs(vsa)<0.2)gl='∞';else{const g=sp/(-vsa);gl=(Math.abs(g)>99?(g<0?'-99+':'99+'):g.toFixed(1))+':1'}}
+ $('gl').textContent=gl;
+ if(gpsOn)$('gs').textContent=gps.acc!=null?'  GPS ±'+Math.round(gps.acc)+' m':'  '+t('gps_s');
+ $('tf').textContent=live?t('infl')+' '+fmt(Date.now()-f.t0)+(altS!==null?'  '+sg(altS-f.a0)+' m':''):'';
+ if(f&&!(live&&altS===null)){
+  $('tt').textContent=fmt(live?Date.now()-f.t0:f.dur);
+  $('gt').textContent=sg(live?altS-f.a0:f.g)+' m';
+  $('th').textContent=live&&f.inT?sg(altS-f.ts)+' m':'–';
+  $('tl').textContent=f.last==null?'–':sg(f.last)+' m'+(f.n?' ('+f.n+')':'');
+  $('mx').textContent=f.max.toFixed(0)+' m';$('mn').textContent=f.min.toFixed(0)+' m';
+  $('bc').textContent=f.bc<-90?'–':(f.bc>=0?'+':'')+f.bc.toFixed(1)+' m/s';
+  $('ws').textContent=f.ws>90?'–':f.ws.toFixed(1)+' m/s';
+  $('di').textContent=((f.dist||0)/1000).toFixed(2)+' km';$('vm').textContent=((f.vmax||0)*3.6).toFixed(0)+' km/h';
+ }
+ if(cur===3)(pv==='alt'?draw:track)(f?f.pr:[]);
+ updCompass();
+}
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const vcol=v=>v>0.2?css('--up'):v<-0.2?css('--dn'):css('--mut');
+function prep(){const cv=$('cv'),g=cv.getContext('2d'),dp=window.devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;if(!W||!H)return null;cv.width=W*dp;cv.height=H*dp;g.setTransform(dp,0,0,dp,0,0);g.clearRect(0,0,W,H);g.font='13px system-ui';g.lineCap='round';return {g,W,H}}
+function draw(pr){
+ const c=prep();if(!c||pr.length<2)return;const {g,W,H}=c;
+ let lo=Math.min(...pr.map(p=>p[1])),hi=Math.max(...pr.map(p=>p[1]));if(hi-lo<10){hi+=5;lo-=5}
+ const T0=pr[pr.length-1][0]||1,x=s=>56+s/T0*(W-70),y=a=>H-26-(a-lo)/(hi-lo)*(H-46);
+ g.strokeStyle=css('--line');g.fillStyle=css('--mut');g.lineWidth=1;
+ g.beginPath();g.moveTo(56,10);g.lineTo(56,H-26);g.lineTo(W-10,H-26);g.stroke();
+ g.fillText(hi.toFixed(0)+' m',4,18);g.fillText(lo.toFixed(0)+' m',4,H-28);g.fillText(fmt(T0*1000),W-60,H-8);
+ g.lineWidth=3.5;
+ for(let i=1;i<pr.length;i++){g.strokeStyle=vcol(pr[i][2]);g.beginPath();g.moveTo(x(pr[i-1][0]),y(pr[i-1][1]));g.lineTo(x(pr[i][0]),y(pr[i][1]));g.stroke()}
+}
+function track(pr){
+ const c=prep();if(!c)return;const {g,W,H}=c,pts=pr.filter(p=>p[3]!=null);
+ g.fillStyle=css('--mut');
+ if(pts.length<2){g.fillText(t('no_gps'),20,30);return}
+ const la0=pts.reduce((s,p)=>s+p[3],0)/pts.length,kx=Math.cos(la0*Math.PI/180),X=p=>p[4]*kx,Y=p=>p[3];
+ const xs=pts.map(X),ys=pts.map(Y),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+ const sc=Math.min((W-60)/((x1-x0)||1e-6),(H-60)/((y1-y0)||1e-6)),ox=(W-(x1-x0)*sc)/2,oy=(H+(y1-y0)*sc)/2;
+ const px=p=>ox+(X(p)-x0)*sc,py=p=>oy-(Y(p)-y0)*sc;
+ g.fillText('N ↑',10,20);g.lineWidth=4;
+ for(let i=1;i<pts.length;i++){g.strokeStyle=vcol(pts[i][2]);g.beginPath();g.moveTo(px(pts[i-1]),py(pts[i-1]));g.lineTo(px(pts[i]),py(pts[i]));g.stroke()}
+ g.fillStyle=css('--ink');g.beginPath();g.arc(px(pts[0]),py(pts[0]),7,0,7);g.fill();g.fillRect(px(pts[pts.length-1])-6,py(pts[pts.length-1])-6,12,12);
+}
+setInterval(render,500);addEventListener('resize',render);
+
+const dl=(n,txt,type)=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type}));a.download=n;a.click()};
+const slug=f=>f.name.replace(/\W+/g,'_')+'_'+f.date;
+function list(){
+ $('fl').innerHTML=flights.map((f,i)=>'<div class="r"><div><b>'+esc(f.name)+'</b><br><small>'+f.date+' · '+fmt(f.dur)+' · '+f.max.toFixed(0)+' m · '+((f.dist||0)/1000).toFixed(1)+' km · '+f.n+' '+t('therm')+'</small></div><span class="row"><button class="k s" data-v="'+i+'">'+t('view')+'</button><button class="k s" data-c="'+i+'">CSV</button><button class="k s" data-g="'+i+'">GPX</button><button class="k s" data-d="'+i+'">'+t('del')+'</button></span></div>').join('')||'<small>'+t('empty')+'</small>';
+}
+$('fl').onclick=e=>{
+ const d=e.target.dataset;
+ if(d.v!==undefined&&!F){V=flights[d.v];show(3)}
+ if(d.d!==undefined&&confirm(t('cdel'))){if(V===flights[d.d])V=null;flights.splice(d.d,1);persist()}
+ if(d.c!==undefined){const f=flights[d.c];dl(slug(f)+'.csv','time_s,altitude_m,vspeed_ms,lat,lon\n'+f.pr.map(p=>[p[0],p[1],p[2],p[3]==null?'':p[3],p[4]==null?'':p[4]].join(',')).join('\n'),'text/csv')}
+ if(d.g!==undefined){const f=flights[d.g];
+  const pts=f.pr.filter(p=>p[3]!=null).map(p=>'<trkpt lat="'+p[3]+'" lon="'+p[4]+'"><ele>'+p[1]+'</ele>'+(f.t0?'<time>'+new Date(f.t0+p[0]*1000).toISOString()+'</time>':'')+'</trkpt>').join('');
+  dl(slug(f)+'.gpx','<?xml version="1.0" encoding="UTF-8"?><gpx version="1.1" creator="HEGAN" xmlns="http://www.topografix.com/GPX/1/1"><trk><name>'+esc(f.name)+'</name><trkseg>'+pts+'</trkseg></trk></gpx>','application/gpx+xml')}
+};
+
+function onData(e){buf+=new TextDecoder().decode(e.target.value);const ls=buf.split(/\r?\n/);buf=ls.pop();for(const l of ls)if(l)onLine(l)}
+$('b').onclick=async()=>{
+ if(!navigator.bluetooth){$('msg').textContent=t('m_nobt');return}
+ try{
+  $('msg').textContent=t('m_pick');
+  const pre=$('np').value.trim();
+  const d=await navigator.bluetooth.requestDevice(pre?{filters:[{namePrefix:pre}],optionalServices:SV}:{acceptAllDevices:true,optionalServices:SV});
+  $('msg').textContent=t('m_conn');
+  const srv=await d.gatt.connect();let n=0;
+  for(const u of SV){let s;try{s=await srv.getPrimaryService(u)}catch(_){continue}
+   for(const c of await s.getCharacteristics())if(c.properties.notify){try{await c.startNotifications();c.addEventListener('characteristicvaluechanged',onData);n++}catch(_){}}}
+  $('msg').textContent=t(n?'m_ok':'m_nochan');startGPS();
+  d.addEventListener('gattserverdisconnected',()=>{$('msg').textContent=t('m_disc')});
+ }catch(e){$('msg').textContent=t('m_fail')+e.message}
+};
+setMode(cmode);applyLang();
+try{if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js')}catch(_){}
+</script></body></html>
